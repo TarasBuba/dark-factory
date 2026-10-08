@@ -151,7 +151,7 @@ async function fetchProduct(id: string) {
   return null;
 }
 
-export const instant = false;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;

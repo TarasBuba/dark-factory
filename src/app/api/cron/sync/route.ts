@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // Затримка між запитами для обходу блокування (Rate Limiting)
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-export const instant = false;
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
