@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum StoreDomain {
+  HOME_DEPOT
+  KMS_TOOLS
+  ATLAS_MACHINERY
+  RONA
+  HOME_HARDWARE
+  CANADIAN_TIRE
+  FEDERATED_TOOL
+  WISE_LINE_TOOLS
+  AMAZON
+  OTHER
+}
+
+model Product {
+  id          String         @id @default(cuid())
+  url         String         @unique // Унікальне посилання
+  store       StoreDomain    // Домен магазину
+  sku         String?        // Артикул магазину
+  title       String         // Назва інструменту
+  imageUrl    String?        // Фото
+  currency    String         @default("CAD") // Базова валюта
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  prices      PriceHistory[]
+
+  @@index([store])
+}
+
+model PriceHistory {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price       Float    
+  isAvailable Boolean  @default(true) 
+  recordedAt  DateTime @default(now())
+
+  @@index([productId, recordedAt(sort: Desc)]) 
+}

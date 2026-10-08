@@ -6,12 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma skills sync || exit 0"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@supabase/supabase-js": "^2.117.3",
+    "cheerio": "^1.2.0",
+    "lucide-react": "^1.52.0",
     "next": "16.4.0",
+    "prisma": "^5.22.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "recharts": "^3.10.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
