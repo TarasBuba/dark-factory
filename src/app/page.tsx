@@ -1,6 +1,7 @@
 import React from "react";
 import SearchForm from "@/components/SearchForm";
 import ProductList from "@/components/ProductList";
+import { addProduct, getProducts } from "@/app/actions/product";
 import {
   Wrench,
   Hammer,
@@ -9,7 +10,11 @@ import {
   Coins,
 } from "lucide-react";
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const products = await getProducts();
+  
   return (
     <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 transition-colors dark:bg-black dark:text-zinc-100">
       {/* Top Notification Banner */}
@@ -112,7 +117,7 @@ export default function Home() {
 
           {/* Interactive Search / URL Tracker Form */}
           <div className="mx-auto mt-8 max-w-3xl text-left">
-            <SearchForm />
+            <SearchForm onAddProduct={addProduct} />
           </div>
         </div>
       </section>
@@ -139,7 +144,7 @@ export default function Home() {
         </div>
 
         {/* Product List Grid */}
-        <ProductList />
+        <ProductList products={products} />
       </main>
 
       {/* Canadian Retailer Coverage Showcase */}
