@@ -143,7 +143,8 @@ export const STORE_META: Record<
   },
 };
 
-import { CANADIAN_DEFAULT_PRODUCTS } from "@/lib/constants/default-products";
+import { CANADIAN_DEFAULT_PRODUCTS, getRetailerSearchUrl } from "@/lib/constants/default-products";
+import PriceCheckButton from "@/components/PriceCheckButton";
 
 // Rich realistic default products across Canadian hardware retailers
 export const DEFAULT_TRACKED_PRODUCTS: TrackedProduct[] = CANADIAN_DEFAULT_PRODUCTS as unknown as TrackedProduct[];
@@ -579,30 +580,37 @@ export default function ProductList({
                   </div>
 
                   {/* Card Footer: Metadata & Actions */}
-                  <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/60">
-                    <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-3">
+                  <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/60 space-y-2.5">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         <span><TimeAgo dateString={product.updatedAt} /></span>
                       </span>
+
+                      {/* Interactive Price Tracker Live Check */}
+                      <PriceCheckButton productId={product.id} />
+                    </div>
+
+                    <div className="flex items-center gap-2">
                       <a
                         href={product.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white py-2 text-xs font-semibold text-zinc-700 shadow-2xs transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-750"
+                        title="Visit product on retailer website"
                       >
                         <span>Visit Store</span>
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLink className="h-3 w-3 text-zinc-400" />
                       </a>
-                    </div>
 
-                    <Link
-                      href={`/product/${product.id}`}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-emerald-500 dark:hover:bg-zinc-750 dark:hover:text-emerald-300"
-                    >
-                      <span>View Price History</span>
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </Link>
+                      <Link
+                        href={`/product/${product.id}`}
+                        className="flex-1 flex items-center justify-center gap-1 rounded-xl bg-zinc-900 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                      >
+                        <span>History</span>
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -698,6 +706,8 @@ export default function ProductList({
                   </div>
 
                   <div className="flex items-center gap-2">
+                    <PriceCheckButton productId={product.id} />
+
                     <a
                       href={product.url}
                       target="_blank"

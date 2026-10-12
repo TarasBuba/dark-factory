@@ -34,7 +34,13 @@ export class UniversalCanadianScraper implements IScraper {
       // Filter out pure numeric IDs and route keywords (en, fr, p, pdp, product, etc.)
       const candidateSegments = segments
         .map(seg => seg.replace(/\.html?$/i, '').trim())
-        .filter(seg => !/^(en|fr|product|products|pdp|p|item|detail|details|\d+)$/i.test(seg));
+        .filter(seg => !/^(en|fr|product|products|pdp|p|item|detail|details|catalogsearch|result|search|\d+)$/i.test(seg));
+
+      // Also check query parameters (?q=, ?query=, ?search_query=) for catalog searches
+      const queryParam = parsed.searchParams.get('q') || parsed.searchParams.get('query') || parsed.searchParams.get('search_query');
+      if (queryParam) {
+        candidateSegments.unshift(queryParam.trim());
+      }
 
       // Pick the segment with the longest descriptive slug (the actual tool name)
       const bestSlug = candidateSegments.sort((a, b) => b.length - a.length)[0] || segments[segments.length - 1] || 'Hardware Tool';

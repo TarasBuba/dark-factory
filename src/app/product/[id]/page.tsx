@@ -130,7 +130,8 @@ function getDemoProduct() {
 
 import { DEFAULT_TRACKED_PRODUCTS } from "@/components/ProductList";
 import { getProductById } from "@/app/actions/product";
-import { resolveAuthenticToolImage } from "@/lib/constants/default-products";
+import { resolveAuthenticToolImage, getRetailerSearchUrl } from "@/lib/constants/default-products";
+import PriceCheckButton from "@/components/PriceCheckButton";
 
 async function fetchProduct(id: string) {
   try {
@@ -270,16 +271,34 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 )}
               </div>
 
-              {/* Direct Link to Retailer */}
-              <a
-                href={product.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 w-full max-w-md inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-semibold transition-all shadow-sm"
-              >
-                <span>Visit on {storeStyle.name}</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
+              {/* Actions Box: Live Price Check & Verified Retailer Links */}
+              <div className="mt-4 w-full max-w-md space-y-2.5">
+                <PriceCheckButton productId={product.id} variant="full" />
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href={product.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold transition-all shadow-sm"
+                    title="Open original product URL"
+                  >
+                    <span>Direct Store Page</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+
+                  <a
+                    href={getRetailerSearchUrl(product.store, product.title, product.sku)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all shadow-sm"
+                    title="Search product on retailer catalog (never 404s)"
+                  >
+                    <span>Search Store</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
+                  </a>
+                </div>
+              </div>
             </div>
 
             {/* Right: Product Details & Key Metrics */}

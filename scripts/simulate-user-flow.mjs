@@ -46,7 +46,12 @@ function deriveFromUrl(url) {
   
   const candidateSegments = segments
     .map(seg => seg.replace(/\.html?$/i, '').trim())
-    .filter(seg => !/^(en|fr|product|products|pdp|p|item|detail|details|\d+)$/i.test(seg));
+    .filter(seg => !/^(en|fr|product|products|pdp|p|item|detail|details|catalogsearch|result|search|\d+)$/i.test(seg));
+
+  const queryParam = parsed.searchParams.get('q') || parsed.searchParams.get('query') || parsed.searchParams.get('search_query');
+  if (queryParam) {
+    candidateSegments.unshift(queryParam.trim());
+  }
 
   const bestSlug = candidateSegments.sort((a, b) => b.length - a.length)[0] || segments[segments.length - 1] || 'Hardware Tool';
   const cleanSlug = bestSlug.replace(/-[0-9]{6,}$/, '');
@@ -76,45 +81,81 @@ function deriveFromUrl(url) {
   };
 }
 
+function getRetailerSearchUrl(store, title, sku) {
+  const query = encodeURIComponent((sku || title || 'tool').trim());
+  const storeNormalized = (store || '').toUpperCase().replace(/[^A-Z]/g, '_');
+
+  switch (storeNormalized) {
+    case 'HOME_DEPOT':
+      return `https://www.homedepot.ca/search?q=${query}`;
+    case 'KMS_TOOLS':
+      return `https://www.kmstools.com/catalogsearch/result/?q=${query}`;
+    case 'ATLAS_MACHINERY':
+      return `https://www.atlas-machinery.com/search.php?search_query=${query}`;
+    case 'RONA':
+      return `https://www.rona.ca/en/search?query=${query}`;
+    case 'CANADIAN_TIRE':
+      return `https://www.canadiantire.ca/en/search-results.html?q=${query}`;
+    case 'HOME_HARDWARE':
+      return `https://www.homehardware.ca/en/search?query=${query}`;
+    case 'FEDERATED_TOOL':
+      return `https://federatedtool.com/search.php?search_query=${query}`;
+    case 'WISE_LINE_TOOLS':
+      return `https://wiselinetools.ca/search.php?search_query=${query}`;
+    case 'AMAZON':
+      return `https://www.amazon.ca/s?k=${query}`;
+    default:
+      return `https://www.google.ca/search?q=${encodeURIComponent(`${title} Canada buy`)}`;
+  }
+}
+
 const testCases = [
   {
     name: 'Home Depot CA - Milwaukee Hammer Drill',
+    store: 'HOME_DEPOT',
     url: 'https://www.homedepot.ca/product/milwaukee-tool-m18-fuel-18v-cordless-hammer-drill/1001565342',
     expectedImageFragment: 'Cordless_drill.jpg',
   },
   {
     name: 'KMS Tools - DeWalt Impact Driver',
-    url: 'https://www.kmstools.com/dewalt-20v-max-xr-brushless-1-4-impact-driver-bare-tool.html',
+    store: 'KMS_TOOLS',
+    url: 'https://www.kmstools.com/catalogsearch/result/?q=dewalt-impact-driver',
     expectedImageFragment: 'Impact_driver_dewalt.jpg',
   },
   {
     name: 'Atlas Machinery - Festool Track Saw',
-    url: 'https://www.atlas-machinery.com/festool/576708-tsc-55-k-cordless-track-saw/',
+    store: 'ATLAS_MACHINERY',
+    url: 'https://www.atlas-machinery.com/search.php?search_query=Festool+track+saw',
     expectedImageFragment: 'Plunge_saw.jpg',
   },
   {
     name: 'RONA - Makita Circular Saw',
-    url: 'https://www.rona.ca/en/product/makita-40v-max-xgt-brushless-circular-saw-7-1-4-in-hs003gz-33075249',
+    store: 'RONA',
+    url: 'https://www.rona.ca/en/search?query=Makita+circular+saw',
     expectedImageFragment: 'Handkreiss',
   },
   {
     name: 'Canadian Tire - Maximum Recip Saw',
+    store: 'CANADIAN_TIRE',
     url: 'https://www.canadiantire.ca/en/pdp/maximum-20v-max-cordless-brushless-reciprocating-saw-bare-tool-0547363p.html',
     expectedImageFragment: 'Reciprocating_saw.jpg',
   },
   {
     name: 'Home Hardware - DeWalt Table Saw',
-    url: 'https://www.homehardware.ca/en/10-15-amp-compact-jobsite-table-saw/p/1240892',
+    store: 'HOME_HARDWARE',
+    url: 'https://www.homehardware.ca/en/search?query=dewalt+table+saw',
     expectedImageFragment: 'Table_saw.jpg',
   },
   {
     name: 'Federated Tool - Miter Saw',
-    url: 'https://www.federatedtool.com/king-canada-10-dual-compound-sliding-miter-saw-8380n/',
+    store: 'FEDERATED_TOOL',
+    url: 'https://federatedtool.com/search.php?search_query=miter+saw',
     expectedImageFragment: 'Compound_miter_saw.jpg',
   },
   {
     name: 'Wise Line Tools - Bosch Palm Router',
-    url: 'https://www.wiselinetools.ca/bosch-gkf12v-25n-palm-router.html',
+    store: 'WISE_LINE_TOOLS',
+    url: 'https://wiselinetools.ca/search.php?search_query=Bosch+router',
     expectedImageFragment: 'Wood_router.jpg',
   },
 ];
@@ -131,7 +172,12 @@ for (const tc of testCases) {
   assert.ok(!res.imageUrl.includes('unsplash'), 'Image must NOT be Unsplash');
   assert.ok(res.imageUrl.includes(tc.expectedImageFragment), `Image must match expected tool photo: ${tc.expectedImageFragment}`);
 
-  console.log(`PASSED (Title: "${res.title.slice(0, 30)}...", CAD $${res.price}, Image: ${tc.expectedImageFragment})`);
+  // Test retailer redirect search URL
+  const searchUrl = getRetailerSearchUrl(tc.store, res.title, 'SKU-TEST');
+  assert.ok(searchUrl.startsWith('https://'), 'Search URL must be valid HTTPS');
+  assert.ok(searchUrl.includes('SKU-TEST') || searchUrl.includes(encodeURIComponent(res.title)), 'Search URL must contain query');
+
+  console.log(`PASSED (Title: "${res.title.slice(0, 28)}...", CAD $${res.price}, Image: ${tc.expectedImageFragment})`);
   passed++;
 }
 

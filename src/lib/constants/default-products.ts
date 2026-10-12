@@ -48,7 +48,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     title: "DeWalt 20V MAX XR Brushless 3-Speed 1/4 in. Impact Driver (Bare Tool)",
     store: "KMS_TOOLS",
     sku: "DCF887B",
-    url: "https://www.kmstools.com/dewalt-20v-max-xr-brushless-1-4-impact-driver-bare-tool.html",
+    url: "https://www.kmstools.com/featured-brands/dewalt-power-tools.html",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Impact_driver_dewalt.jpg/640px-Impact_driver_dewalt.jpg",
     currency: "CAD",
     isActive: true,
@@ -67,7 +67,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     title: "Festool TSC 55 KEB-Basic Cordless Plunge-Cut Track Saw (Systainer)",
     store: "ATLAS_MACHINERY",
     sku: "576708",
-    url: "https://www.atlas-machinery.com/festool/576708-tsc-55-k-cordless-track-saw/",
+    url: "https://www.atlas-machinery.com/search.php?search_query=576708",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Plunge_saw.jpg/640px-Plunge_saw.jpg",
     currency: "CAD",
     isActive: true,
@@ -86,7 +86,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     title: "Makita 40V Max XGT Brushless 7-1/4 in. Rear Handle Circular Saw (Tool Only)",
     store: "RONA",
     sku: "GSR01Z",
-    url: "https://www.rona.ca/en/product/makita-40v-max-xgt-brushless-circular-saw-7-1-4-in-hs003gz-33075249",
+    url: "https://www.rona.ca/en/search?query=Makita+circular+saw",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Handkreiss%C3%A4ge_Makita_5008MG.jpg/640px-Handkreiss%C3%A4ge_Makita_5008MG.jpg",
     currency: "CAD",
     isActive: true,
@@ -124,7 +124,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     title: "DeWalt 10 in. 15-Amp Compact Jobsite Table Saw with Site-Pro Modular Guarding",
     store: "HOME_HARDWARE",
     sku: "DWE7485",
-    url: "https://www.homehardware.ca/en/10-15-amp-compact-jobsite-table-saw/p/1240892",
+    url: "https://www.homehardware.ca/en/search?query=DWE7485",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Table_saw.jpg/640px-Table_saw.jpg",
     currency: "CAD",
     isActive: true,
@@ -143,7 +143,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     title: "King Canada 10 in. Dual Compound Sliding Miter Saw with Twin Laser Guide",
     store: "FEDERATED_TOOL",
     sku: "8380N",
-    url: "https://www.federatedtool.com/king-canada-10-dual-compound-sliding-miter-saw-8380n/",
+    url: "https://federatedtool.com/search.php?search_query=8380N",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Compound_miter_saw.jpg/640px-Compound_miter_saw.jpg",
     currency: "CAD",
     isActive: true,
@@ -162,7 +162,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     title: "Bosch 12V Max Palm Edge Cordless Router (Tool Only)",
     store: "WISE_LINE_TOOLS",
     sku: "GKF12V-25N",
-    url: "https://www.wiselinetools.ca/bosch-gkf12v-25n-palm-router.html",
+    url: "https://wiselinetools.ca/search.php?search_query=Bosch+router",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Wood_router.jpg/640px-Wood_router.jpg",
     currency: "CAD",
     isActive: true,
@@ -218,4 +218,40 @@ export function resolveAuthenticToolImage(text: string): string {
 
   // Default authentic tool: Cordless drill
   return 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Cordless_drill.jpg/640px-Cordless_drill.jpg';
+}
+
+/**
+ * Returns a guaranteed working canonical search/product destination on the retailer's official website.
+ * Prevents 404 "Object Not Found" errors by using resilient canonical store search queries.
+ */
+export function getRetailerSearchUrl(
+  store: string,
+  title: string,
+  sku?: string | null
+): string {
+  const query = encodeURIComponent((sku || title || 'tool').trim());
+  const storeNormalized = (store || '').toUpperCase().replace(/[^A-Z]/g, '_');
+
+  switch (storeNormalized) {
+    case 'HOME_DEPOT':
+      return `https://www.homedepot.ca/search?q=${query}`;
+    case 'KMS_TOOLS':
+      return `https://www.kmstools.com/catalogsearch/result/?q=${query}`;
+    case 'ATLAS_MACHINERY':
+      return `https://www.atlas-machinery.com/search.php?search_query=${query}`;
+    case 'RONA':
+      return `https://www.rona.ca/en/search?query=${query}`;
+    case 'CANADIAN_TIRE':
+      return `https://www.canadiantire.ca/en/search-results.html?q=${query}`;
+    case 'HOME_HARDWARE':
+      return `https://www.homehardware.ca/en/search?query=${query}`;
+    case 'FEDERATED_TOOL':
+      return `https://federatedtool.com/search.php?search_query=${query}`;
+    case 'WISE_LINE_TOOLS':
+      return `https://wiselinetools.ca/search.php?search_query=${query}`;
+    case 'AMAZON':
+      return `https://www.amazon.ca/s?k=${query}`;
+    default:
+      return `https://www.google.ca/search?q=${encodeURIComponent(`${title} Canada buy`)}`;
+  }
 }
