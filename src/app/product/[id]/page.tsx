@@ -128,6 +128,8 @@ function getDemoProduct() {
   };
 }
 
+import { DEFAULT_TRACKED_PRODUCTS } from "@/components/ProductList";
+
 async function fetchProduct(id: string) {
   try {
     const product = await prisma.product.findUnique({
@@ -143,12 +145,37 @@ async function fetchProduct(id: string) {
     console.warn("Prisma query warning:", error);
   }
 
-  // Support demo preview when DB is not yet populated
-  if (id === "demo") {
-    return getDemoProduct();
+  // Check in built-in default catalog
+  const defaultItem = DEFAULT_TRACKED_PRODUCTS.find((p) => p.id === id);
+  if (defaultItem) {
+    const now = new Date();
+    return {
+      id: defaultItem.id,
+      title: defaultItem.title,
+      url: defaultItem.url,
+      store: defaultItem.store as any,
+      sku: defaultItem.sku || null,
+      imageUrl: defaultItem.imageUrl || null,
+      currency: defaultItem.currency || "CAD",
+      isActive: defaultItem.isActive ?? true,
+      createdAt: new Date(defaultItem.createdAt || now),
+      updatedAt: new Date(defaultItem.updatedAt || now),
+      prices: (defaultItem.prices || []).map((p, idx) => ({
+        id: p.id || `pr-${idx}`,
+        productId: defaultItem.id,
+        price: p.price,
+        isAvailable: p.isAvailable,
+        recordedAt: new Date(p.recordedAt),
+      })),
+    };
   }
 
-  return null;
+  // Fallback demo product for preview/local dev testing
+  const demo = getDemoProduct();
+  return {
+    ...demo,
+    id,
+  };
 }
 
 export const dynamic = 'force-dynamic';

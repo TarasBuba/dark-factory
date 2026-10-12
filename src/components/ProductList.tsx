@@ -332,7 +332,7 @@ function TimeAgo({ dateString }: { dateString?: string | Date }) {
 export type SortOption = "lowest" | "highest" | "discount" | "newest";
 
 export default function ProductList({
-  products = DEFAULT_TRACKED_PRODUCTS,
+  products,
   className = "",
 }: ProductListProps) {
   const [selectedStore, setSelectedStore] = useState<string>("ALL");
@@ -340,9 +340,13 @@ export default function ProductList({
   const [sortBy, setSortBy] = useState<SortOption>("discount");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  const activeProducts = useMemo(() => {
+    return products && products.length > 0 ? products : DEFAULT_TRACKED_PRODUCTS;
+  }, [products]);
+
   // Derive price details for each product
   const enrichedProducts = useMemo(() => {
-    return products.map((item) => {
+    return activeProducts.map((item) => {
       // Calculate latest price & previous price if not already set
       let curr = item.currentPrice;
       let prev = item.previousPrice;
@@ -529,7 +533,7 @@ export default function ProductList({
         <div className="flex items-center gap-1.5">
           <span>Showing</span>
           <strong className="text-zinc-900 dark:text-zinc-100">{filteredProducts.length}</strong>
-          <span>of {products.length} tracked Canadian hardware items</span>
+          <span>of {activeProducts.length} tracked Canadian hardware items</span>
         </div>
         <div className="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
           <Zap className="h-3.5 w-3.5" />

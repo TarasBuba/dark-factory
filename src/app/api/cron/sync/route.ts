@@ -74,14 +74,21 @@ export async function GET(request: Request) {
           results.failed++;
           results.errors.push(`[${product.id}] ${error.message}`);
           
-          // Якщо товар недоступний, записуємо це
-          await prisma.priceHistory.create({
-            data: {
-              productId: product.id,
-              price: 0,
-              isAvailable: false,
-            },
+          // Якщо товар тимчасово недоступний або заблокований, зберігаємо останню відому ціну
+          const lastPriceRecord = await prisma.priceHistory.findFirst({
+            where: { productId: product.id },
+            orderBy: { recordedAt: 'desc' },
           });
+
+          if (lastPriceRecord) {
+            await prisma.priceHistory.create({
+              data: {
+                productId: product.id,
+                price: lastPriceRecord.price,
+                isAvailable: false,
+              },
+            });
+          }
         }
       }
     }

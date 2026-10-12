@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Link as LinkIcon,
@@ -66,6 +67,7 @@ const CANADIAN_RETAILERS = [
 ];
 
 export default function SearchForm({ onAddProduct, className = "" }: SearchFormProps) {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
@@ -146,6 +148,7 @@ export default function SearchForm({ onAddProduct, className = "" }: SearchFormP
           : "Successfully queued tool for automated price tracking (CAD)!",
       });
       setUrl("");
+      router.refresh();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to add product. Please try again.";
       setStatusMessage({

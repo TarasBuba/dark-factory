@@ -2,8 +2,7 @@ import { StoreDomain } from '@prisma/client';
 import { KmsScraper } from './cheerio/kms';
 import { AtlasScraper } from './cheerio/atlas';
 import { FederatedScraper } from './cheerio/federated';
-import { HomeDepotScraper } from './api/homedepot';
-import { AmazonScraper } from './api/amazon';
+import { UniversalCanadianScraper } from './universal';
 
 export interface ScrapedProduct {
   title: string;
@@ -57,7 +56,7 @@ export function detectStore(url: string): StoreDomain {
 
     return StoreDomain.OTHER;
   } catch {
-    throw new Error(`Invalid URL format: ${url}`);
+    return StoreDomain.OTHER;
   }
 }
 
@@ -77,8 +76,13 @@ export class ScraperFactory {
     this.scrapers.set(StoreDomain.KMS_TOOLS, new KmsScraper());
     this.scrapers.set(StoreDomain.ATLAS_MACHINERY, new AtlasScraper());
     this.scrapers.set(StoreDomain.FEDERATED_TOOL, new FederatedScraper());
-    this.scrapers.set(StoreDomain.HOME_DEPOT, new HomeDepotScraper());
-    this.scrapers.set(StoreDomain.AMAZON, new AmazonScraper());
+    this.scrapers.set(StoreDomain.HOME_DEPOT, new UniversalCanadianScraper(StoreDomain.HOME_DEPOT));
+    this.scrapers.set(StoreDomain.AMAZON, new UniversalCanadianScraper(StoreDomain.AMAZON));
+    this.scrapers.set(StoreDomain.RONA, new UniversalCanadianScraper(StoreDomain.RONA));
+    this.scrapers.set(StoreDomain.HOME_HARDWARE, new UniversalCanadianScraper(StoreDomain.HOME_HARDWARE));
+    this.scrapers.set(StoreDomain.CANADIAN_TIRE, new UniversalCanadianScraper(StoreDomain.CANADIAN_TIRE));
+    this.scrapers.set(StoreDomain.WISE_LINE_TOOLS, new UniversalCanadianScraper(StoreDomain.WISE_LINE_TOOLS));
+    this.scrapers.set(StoreDomain.OTHER, new UniversalCanadianScraper(StoreDomain.OTHER));
     this.initialized = true;
   }
 
@@ -101,7 +105,7 @@ export class ScraperFactory {
 
     const scraper = this.scrapers.get(store);
     if (!scraper) {
-      throw new Error(`No scraper registered for store domain: ${store}`);
+      return new UniversalCanadianScraper(store || StoreDomain.OTHER);
     }
 
     return scraper;

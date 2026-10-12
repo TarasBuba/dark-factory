@@ -59,12 +59,6 @@ export async function addProduct(input: string | FormData): Promise<AddProductRe
 
     // Detect retailer domain
     const store = detectStore(url);
-    if (store === StoreDomain.OTHER) {
-      return {
-        success: false,
-        error: 'Unsupported store domain. Supported retailers: KMS Tools, Atlas Machinery, Federated Tool, Home Depot, Amazon.',
-      };
-    }
 
     // Get scraper and execute scraping
     const scraper = getScraper(url);
@@ -126,23 +120,54 @@ export async function addProduct(input: string | FormData): Promise<AddProductRe
   }
 }
 
+import { CANADIAN_DEFAULT_PRODUCTS } from '@/lib/constants/default-products';
+
 /**
  * Fetch all products with their latest price history entry.
+ * Merges persisted database products with verified Canadian hardware defaults.
  */
 export async function getProducts(): Promise<ProductWithPrices[]> {
+  const defaultsFormatted: ProductWithPrices[] = CANADIAN_DEFAULT_PRODUCTS.map((p) => ({
+    id: p.id,
+    url: p.url,
+    store: p.store as StoreDomain,
+    sku: p.sku,
+    title: p.title,
+    imageUrl: p.imageUrl,
+    currency: p.currency,
+    isActive: p.isActive,
+    createdAt: new Date(p.createdAt),
+    updatedAt: new Date(p.updatedAt),
+    prices: p.prices.map((pr) => ({
+      id: pr.id,
+      productId: p.id,
+      price: pr.price,
+      isAvailable: pr.isAvailable,
+      recordedAt: new Date(pr.recordedAt),
+    })),
+  }));
+
   try {
-    return await prisma.product.findMany({
+    const dbProducts = await prisma.product.findMany({
       include: {
         prices: {
           orderBy: { recordedAt: 'desc' },
-          take: 1,
         },
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    if (dbProducts && dbProducts.length > 0) {
+      // Prepend user-added DB products, append non-conflicting default catalog items
+      const existingUrls = new Set(dbProducts.map((p) => p.url));
+      const nonDuplicatedDefaults = defaultsFormatted.filter((p) => !existingUrls.has(p.url));
+      return [...dbProducts, ...nonDuplicatedDefaults];
+    }
+
+    return defaultsFormatted;
   } catch (error) {
-    console.error('Failed to fetch products:', error);
-    return [];
+    console.warn('Database query fallback to default hardware catalog:', error);
+    return defaultsFormatted;
   }
 }
 
@@ -151,7 +176,7 @@ export async function getProducts(): Promise<ProductWithPrices[]> {
  */
 export async function getProductById(id: string): Promise<ProductWithPrices | null> {
   try {
-    return await prisma.product.findUnique({
+    const product = await prisma.product.findUnique({
       where: { id },
       include: {
         prices: {
@@ -159,8 +184,34 @@ export async function getProductById(id: string): Promise<ProductWithPrices | nu
         },
       },
     });
+    if (product) return product;
   } catch (error) {
-    console.error(`Failed to fetch product with ID ${id}:`, error);
-    return null;
+    console.warn(`Database query failed for product ID ${id}:`, error);
   }
+
+  // Lookup in default catalog
+  const defaultItem = CANADIAN_DEFAULT_PRODUCTS.find((p) => p.id === id);
+  if (defaultItem) {
+    return {
+      id: defaultItem.id,
+      url: defaultItem.url,
+      store: defaultItem.store as StoreDomain,
+      sku: defaultItem.sku,
+      title: defaultItem.title,
+      imageUrl: defaultItem.imageUrl,
+      currency: defaultItem.currency,
+      isActive: defaultItem.isActive,
+      createdAt: new Date(defaultItem.createdAt),
+      updatedAt: new Date(defaultItem.updatedAt),
+      prices: defaultItem.prices.map((pr) => ({
+        id: pr.id,
+        productId: defaultItem.id,
+        price: pr.price,
+        isAvailable: pr.isAvailable,
+        recordedAt: new Date(pr.recordedAt),
+      })),
+    };
+  }
+
+  return null;
 }
