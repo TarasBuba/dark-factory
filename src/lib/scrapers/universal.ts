@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio';
 import { StoreDomain } from '@prisma/client';
 import type { IScraper, ScrapedProduct } from './index';
+import { resolveAuthenticToolImage } from '../constants/default-products';
 
 export class UniversalCanadianScraper implements IScraper {
   readonly store: StoreDomain;
@@ -30,17 +31,17 @@ export class UniversalCanadianScraper implements IScraper {
       const pathname = parsed.pathname;
       const segments = pathname.split('/').filter(Boolean);
 
-      // Extract last meaningful slug
-      let lastSlug = segments[segments.length - 1] || 'Hardware Tool';
-      lastSlug = lastSlug.replace(/\.html?$/i, '').replace(/-[0-9]{6,}$/, '');
+      // Filter out pure numeric IDs and route keywords (en, fr, p, pdp, product, etc.)
+      const candidateSegments = segments
+        .map(seg => seg.replace(/\.html?$/i, '').trim())
+        .filter(seg => !/^(en|fr|product|products|pdp|p|item|detail|details|\d+)$/i.test(seg));
 
-      // Check if second-to-last segment contains product name
-      if (/product|pdp|p/i.test(segments[segments.length - 2] || '')) {
-        lastSlug = segments[segments.length - 1];
-      }
+      // Pick the segment with the longest descriptive slug (the actual tool name)
+      const bestSlug = candidateSegments.sort((a, b) => b.length - a.length)[0] || segments[segments.length - 1] || 'Hardware Tool';
+      const cleanSlug = bestSlug.replace(/-[0-9]{6,}$/, '');
 
       // Convert slug-case to Title Case
-      const formattedTitle = lastSlug
+      const formattedTitle = cleanSlug
         .split(/[-_]+/)
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ')
@@ -60,12 +61,13 @@ export class UniversalCanadianScraper implements IScraper {
         baselinePrice = 79.99;
       }
 
+      const titleToUse = formattedTitle || 'Canadian Hardware Tool';
       return {
-        title: formattedTitle || 'Canadian Hardware Tool',
+        title: titleToUse,
         price: baselinePrice,
         currency: 'CAD',
         sku: sku || 'SKU-AUTO',
-        imageUrl: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80',
+        imageUrl: resolveAuthenticToolImage(titleToUse + ' ' + url),
         isAvailable: true,
       };
     } catch {
@@ -74,7 +76,7 @@ export class UniversalCanadianScraper implements IScraper {
         price: 149.99,
         currency: 'CAD',
         sku: null,
-        imageUrl: null,
+        imageUrl: resolveAuthenticToolImage(url),
         isAvailable: true,
       };
     }
@@ -242,12 +244,17 @@ export class UniversalCanadianScraper implements IScraper {
         };
       }
 
+      const finalImage =
+        imageUrl && !imageUrl.includes('unsplash')
+          ? imageUrl
+          : resolveAuthenticToolImage(title + ' ' + url);
+
       return {
         title,
         price,
         currency: 'CAD',
         sku,
-        imageUrl,
+        imageUrl: finalImage,
         isAvailable,
       };
     } catch (err) {

@@ -29,7 +29,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "HOME_DEPOT",
     sku: "2904-20",
     url: "https://www.homedepot.ca/product/milwaukee-tool-m18-fuel-18v-cordless-hammer-drill/1001565342",
-    imageUrl: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Cordless_drill.jpg/640px-Cordless_drill.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 198.0,
@@ -49,7 +49,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "KMS_TOOLS",
     sku: "DCF887B",
     url: "https://www.kmstools.com/dewalt-20v-max-xr-brushless-1-4-impact-driver-bare-tool.html",
-    imageUrl: "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Impact_driver_dewalt.jpg/640px-Impact_driver_dewalt.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 169.99,
@@ -68,7 +68,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "ATLAS_MACHINERY",
     sku: "576708",
     url: "https://www.atlas-machinery.com/festool/576708-tsc-55-k-cordless-track-saw/",
-    imageUrl: "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Plunge_saw.jpg/640px-Plunge_saw.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 775.0,
@@ -87,7 +87,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "RONA",
     sku: "GSR01Z",
     url: "https://www.rona.ca/en/product/makita-40v-max-xgt-brushless-circular-saw-7-1-4-in-hs003gz-33075249",
-    imageUrl: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Handkreiss%C3%A4ge_Makita_5008MG.jpg/640px-Handkreiss%C3%A4ge_Makita_5008MG.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 349.0,
@@ -106,7 +106,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "CANADIAN_TIRE",
     sku: "054-7363-4",
     url: "https://www.canadiantire.ca/en/pdp/maximum-20v-max-cordless-brushless-reciprocating-saw-bare-tool-0547363p.html",
-    imageUrl: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Reciprocating_saw.jpg/640px-Reciprocating_saw.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 129.99,
@@ -125,7 +125,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "HOME_HARDWARE",
     sku: "DWE7485",
     url: "https://www.homehardware.ca/en/10-15-amp-compact-jobsite-table-saw/p/1240892",
-    imageUrl: "https://images.unsplash.com/photo-1508873696983-2df5293cb32f?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Table_saw.jpg/640px-Table_saw.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 429.0,
@@ -144,7 +144,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "FEDERATED_TOOL",
     sku: "8380N",
     url: "https://www.federatedtool.com/king-canada-10-dual-compound-sliding-miter-saw-8380n/",
-    imageUrl: "https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Compound_miter_saw.jpg/640px-Compound_miter_saw.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 289.0,
@@ -163,7 +163,7 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     store: "WISE_LINE_TOOLS",
     sku: "GKF12V-25N",
     url: "https://www.wiselinetools.ca/bosch-gkf12v-25n-palm-router.html",
-    imageUrl: "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=600&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Wood_router.jpg/640px-Wood_router.jpg",
     currency: "CAD",
     isActive: true,
     currentPrice: 189.0,
@@ -177,3 +177,45 @@ export const CANADIAN_DEFAULT_PRODUCTS: DefaultProduct[] = [
     ],
   },
 ];
+
+/**
+ * Resolves an authentic, high-resolution photo of real hardware tools based on title or URL keywords.
+ * Completely replaces all generic stock photo placeholders with authentic power tool imagery.
+ */
+export function resolveAuthenticToolImage(text: string): string {
+  const lower = (text || '').toLowerCase();
+
+  if (lower.includes('impact') || lower.includes('driver')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Impact_driver_dewalt.jpg/640px-Impact_driver_dewalt.jpg';
+  }
+  if (lower.includes('track saw') || lower.includes('plunge')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Plunge_saw.jpg/640px-Plunge_saw.jpg';
+  }
+  if (lower.includes('table saw')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Table_saw.jpg/640px-Table_saw.jpg';
+  }
+  if (lower.includes('miter') || lower.includes('mitre')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Compound_miter_saw.jpg/640px-Compound_miter_saw.jpg';
+  }
+  if (lower.includes('recip') || lower.includes('sawzall')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Reciprocating_saw.jpg/640px-Reciprocating_saw.jpg';
+  }
+  if (lower.includes('circular') || lower.includes('handkreiss')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Handkreiss%C3%A4ge_Makita_5008MG.jpg/640px-Handkreiss%C3%A4ge_Makita_5008MG.jpg';
+  }
+  if (lower.includes('router') || lower.includes('trim')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Wood_router.jpg/640px-Wood_router.jpg';
+  }
+  if (lower.includes('grind') || lower.includes('angle grinder')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Angle_grinder.jpg/640px-Angle_grinder.jpg';
+  }
+  if (lower.includes('sand') || lower.includes('orbital')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Orbital_sander.jpg/640px-Orbital_sander.jpg';
+  }
+  if (lower.includes('saw')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Handkreiss%C3%A4ge_Makita_5008MG.jpg/640px-Handkreiss%C3%A4ge_Makita_5008MG.jpg';
+  }
+
+  // Default authentic tool: Cordless drill
+  return 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Cordless_drill.jpg/640px-Cordless_drill.jpg';
+}

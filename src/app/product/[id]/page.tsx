@@ -110,7 +110,7 @@ function getDemoProduct() {
     url: "https://www.homedepot.ca/product/milwaukee-tool-m18-fuel-1-2-inch-hammer-drill-driver-bare-tool/1001683412",
     store: "HOME_DEPOT" as const,
     sku: "1001683412",
-    imageUrl: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Cordless_drill.jpg/640px-Cordless_drill.jpg",
     currency: "CAD",
     isActive: true,
     createdAt: makeDate(45),
@@ -129,45 +129,15 @@ function getDemoProduct() {
 }
 
 import { DEFAULT_TRACKED_PRODUCTS } from "@/components/ProductList";
+import { getProductById } from "@/app/actions/product";
+import { resolveAuthenticToolImage } from "@/lib/constants/default-products";
 
 async function fetchProduct(id: string) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { id },
-      include: {
-        prices: {
-          orderBy: { recordedAt: "asc" },
-        },
-      },
-    });
-    if (product) return product;
+    const item = await getProductById(id);
+    if (item) return item;
   } catch (error) {
-    console.warn("Prisma query warning:", error);
-  }
-
-  // Check in built-in default catalog
-  const defaultItem = DEFAULT_TRACKED_PRODUCTS.find((p) => p.id === id);
-  if (defaultItem) {
-    const now = new Date();
-    return {
-      id: defaultItem.id,
-      title: defaultItem.title,
-      url: defaultItem.url,
-      store: defaultItem.store as any,
-      sku: defaultItem.sku || null,
-      imageUrl: defaultItem.imageUrl || null,
-      currency: defaultItem.currency || "CAD",
-      isActive: defaultItem.isActive ?? true,
-      createdAt: new Date(defaultItem.createdAt || now),
-      updatedAt: new Date(defaultItem.updatedAt || now),
-      prices: (defaultItem.prices || []).map((p, idx) => ({
-        id: p.id || `pr-${idx}`,
-        productId: defaultItem.id,
-        price: p.price,
-        isAvailable: p.isAvailable,
-        recordedAt: new Date(p.recordedAt),
-      })),
-    };
+    console.warn("fetchProduct via getProductById error:", error);
   }
 
   // Fallback demo product for preview/local dev testing
@@ -175,6 +145,7 @@ async function fetchProduct(id: string) {
   return {
     ...demo,
     id,
+    imageUrl: resolveAuthenticToolImage(demo.title),
   };
 }
 

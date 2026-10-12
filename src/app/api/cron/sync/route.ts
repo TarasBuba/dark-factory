@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { PrismaClient } from '@prisma/client';
 import { ScraperFactory } from '@/lib/scrapers';
-
-const prisma = new PrismaClient();
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const prisma = globalForPrisma.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 // Затримка між запитами для обходу блокування (Rate Limiting)
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));

@@ -129,12 +129,26 @@ export default function SearchForm({ onAddProduct, className = "" }: SearchFormP
     try {
       if (onAddProduct) {
         const res = await onAddProduct(cleanUrl);
-        if (res && typeof res === 'object' && res.success === false) {
-          setStatusMessage({
-            type: "error",
-            text: res.error || "Failed to scrape product details.",
-          });
-          return;
+        if (res && typeof res === 'object') {
+          if (res.success === false) {
+            setStatusMessage({
+              type: "error",
+              text: res.error || "Failed to scrape product details.",
+            });
+            return;
+          }
+          if (res.product && typeof window !== 'undefined') {
+            try {
+              const key = 'cantool_saved_products';
+              const existing = JSON.parse(localStorage.getItem(key) || '[]');
+              const filtered = existing.filter((p: { url: string }) => p.url !== res.product.url);
+              filtered.unshift(res.product);
+              localStorage.setItem(key, JSON.stringify(filtered));
+              window.dispatchEvent(new CustomEvent('tool-catalog-updated', { detail: res.product }));
+            } catch (storageErr) {
+              console.warn('LocalStorage save skipped:', storageErr);
+            }
+          }
         }
       } else {
         // Fallback simulated tracking registration

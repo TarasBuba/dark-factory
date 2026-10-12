@@ -37,6 +37,12 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Build failed" }
     $Results.steps["production_build"] = "PASSED"
 
+    # Step 4: End-to-End User Simulation
+    Write-Host "`n4. [Mesh: Test Engineer] Executing end-to-end Canadian hardware store simulations..." -ForegroundColor Yellow
+    node scripts/simulate-user-flow.mjs
+    if ($LASTEXITCODE -ne 0) { throw "Simulation tests failed" }
+    $Results.steps["user_flow_simulation"] = "PASSED"
+
     $Results.passed = $true
     $Duration = ((Get-Date) - $StartTime).TotalSeconds
     $Results["durationSeconds"] = $Duration
