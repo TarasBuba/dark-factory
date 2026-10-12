@@ -1,0 +1,35 @@
+{
+  "name": "dark-factory",
+  "version": "1.0.0",
+  "specificationSource": "https://21no.de/publications/ai-dark-factories/",
+  "mode": "lights-out",
+  "autonomousMode": {
+    "enabled": true,
+    "zeroHumanSeams": true,
+    "autoResolveAmbiguities": true,
+    "maxAutoFixIterations": 3,
+    "escalateOnFatalOnly": true
+  },
+  "layers": {
+    "goalFoundry": {
+      "path": ".darkfactory/goals",
+      "holdoutScenariosPath": ".darkfactory/scenarios",
+      "invariantsPath": ".darkfactory/invariants"
+    },
+    "productionMesh": {
+      "rolesConfig": ".darkfactory/mesh/roles.json",
+      "gatesConfig": ".darkfactory/gates"
+    },
+    "feedbackLoop": {
+      "telemetryPath": ".darkfactory/telemetry",
+      "autoFixEnabled": true
+    }
+  },
+  "verification": {
+    "deterministicScript": "scripts/verify-gate.ps1",
+    "enforceTypeCheck": true,
+    "enforceLint": true,
+    "enforceBuild": true,
+    "enforceSecurityScan": true
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "invariants": [
+    {
+      "id": "INV-001",
+      "name": "Zero Committed Secrets",
+      "level": "FATAL",
+      "description": "No API keys, database passwords, or auth tokens may ever be written to source code or git. All secrets must resolve via process.env.",
+      "checker": "scripts/check-secrets.ps1"
+    },
+    {
+      "id": "INV-002",
+      "name": "Safe Non-Destructive Storage",
+      "level": "FATAL",
+      "description": "No unconfirmed DROP TABLE, TRUNCATE or schema-destroying commands on production DB.",
+      "checker": "prisma"
+    },
+    {
+      "id": "INV-003",
+      "name": "Scraper Rate Limiting & Stealth",
+      "level": "CRITICAL",
+      "description": "All retailer scrapes must obey store-grouped rate limiting (minimum 2000ms delay) to avoid IP bans.",
+      "checker": "code-review"
+    },
+    {
+      "id": "INV-004",
+      "name": "Hydration Safety in Client Components",
+      "level": "CRITICAL",
+      "description": "Time-dependent values like Date.now() must be rendered in useEffect or dedicated hydration-safe wrappers.",
+      "checker": "next-build"
+    },
+    {
+      "id": "INV-005",
+      "name": "Deterministic Verification Chain",
+      "level": "FATAL",
+      "description": "No commit may be pushed to main without clean exit code 0 from verify-gate.",
+      "checker": "verify-gate"
+    }
+  ]
+}

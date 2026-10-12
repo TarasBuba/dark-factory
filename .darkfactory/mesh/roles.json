@@ -1,0 +1,58 @@
+{
+  "roles": [
+    {
+      "id": "orchestrator",
+      "name": "Production Orchestrator",
+      "tier": "pro",
+      "responsibility": "Routes tasks through the pipeline, maintains global state, enforces budgets, supervises loops."
+    },
+    {
+      "id": "architect",
+      "name": "System Architect",
+      "tier": "pro",
+      "responsibility": "System structure, component boundaries, interface contracts, schema designs."
+    },
+    {
+      "id": "coder",
+      "name": "Software Engineer",
+      "tier": "inherit",
+      "responsibility": "Implementation in designated languages and frameworks without seeing holdout scenarios."
+    },
+    {
+      "id": "reviewer",
+      "name": "Adversarial Reviewer",
+      "tier": "pro",
+      "responsibility": "Cross-checking outputs against specifications, holdouts, regressions, and prior decisions."
+    },
+    {
+      "id": "tester",
+      "name": "Test & QA Engineer",
+      "tier": "inherit",
+      "responsibility": "Scenario generation, property-based testing, edge cases, load simulation."
+    },
+    {
+      "id": "security",
+      "name": "Security Auditor",
+      "tier": "pro",
+      "responsibility": "Static analysis, threat modeling, dependency scanning, secret leakage prevention."
+    },
+    {
+      "id": "docs",
+      "name": "Documentation Agent",
+      "tier": "inherit",
+      "responsibility": "API docs, runbooks, changelogs, user-facing guides — produced before deploy as a blocker."
+    },
+    {
+      "id": "compliance",
+      "name": "Compliance & Governance Agent",
+      "tier": "pro",
+      "responsibility": "Regulatory alignment, audit trails, data governance, invariant monitoring."
+    },
+    {
+      "id": "operator",
+      "name": "Deployment Operator",
+      "tier": "inherit",
+      "responsibility": "Deterministic build verification, environment sync, git release, incident alerting."
+    }
+  ]
+}

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 export interface SearchFormProps {
-  onAddProduct?: (url: string) => Promise<void> | void;
+  onAddProduct?: (url: string) => Promise<any> | any;
   className?: string;
 }
 
@@ -126,7 +126,14 @@ export default function SearchForm({ onAddProduct, className = "" }: SearchFormP
 
     try {
       if (onAddProduct) {
-        await onAddProduct(cleanUrl);
+        const res = await onAddProduct(cleanUrl);
+        if (res && typeof res === 'object' && res.success === false) {
+          setStatusMessage({
+            type: "error",
+            text: res.error || "Failed to scrape product details.",
+          });
+          return;
+        }
       } else {
         // Fallback simulated tracking registration
         await new Promise((resolve) => setTimeout(resolve, 900));

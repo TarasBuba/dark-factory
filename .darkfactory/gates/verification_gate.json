@@ -1,0 +1,23 @@
+{
+  "gate": "VERIFICATION_GATE",
+  "version": "1.0",
+  "mode": "ENFORCED",
+  "checks": [
+    {
+      "name": "Secret Scanner",
+      "command": "powershell -File scripts/check-secrets.ps1",
+      "blocking": true
+    },
+    {
+      "name": "Prisma Schema Validate",
+      "command": "npx prisma validate",
+      "blocking": true
+    },
+    {
+      "name": "Next.js Production Build",
+      "command": "npm run build",
+      "blocking": true
+    }
+  ],
+  "failureAction": "TRIGGER_AUTO_FIX_LOOP"
+}

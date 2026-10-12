@@ -1,0 +1,38 @@
+{
+  "id": "GT-001",
+  "title": "Canadian Hardware & Tool Price Tracker",
+  "version": "1.0.0",
+  "status": "OPERATIONAL",
+  "goalTree": {
+    "intent": "Autonomous tracking of building tool prices across Canadian hardware retailers with automated scraping, price change analytics, and zero-cost hosting.",
+    "objectives": [
+      "Extract live prices and stock statuses from major Canadian retailers (Home Depot CA, KMS Tools, Atlas Machinery, Rona, Federated Tool)",
+      "Maintain historical price audit records in PostgreSQL database via Prisma",
+      "Display real-time CAD metrics, price drop percentages, and interactive charts",
+      "Execute scheduled cron updates without triggering retailer bot blocks"
+    ],
+    "constraints": [
+      "100% Free tier architecture (Vercel + Supabase + open DOM scrapers)",
+      "Strict rate limiting per store domain (minimum 2s jitter delay)",
+      "Zero human handoff during build and verification pipeline"
+    ],
+    "success_criteria": [
+      "Next.js production build exits with code 0",
+      "URL paste accurately detects retailer and persists to database",
+      "Interactive recharts visualizes at least 3 historical price points",
+      "Cron endpoint /api/cron/sync executes without unhandled hanging promises"
+    ],
+    "invariants": [
+      "INV-001 (Zero Committed Secrets)",
+      "INV-002 (Safe Non-Destructive Storage)",
+      "INV-003 (Scraper Rate Limiting)",
+      "INV-004 (Hydration Safety)",
+      "INV-005 (Deterministic Verification Chain)"
+    ],
+    "failure_modes": [
+      "DOM structure changes at retailer causing scraper null pointer exception",
+      "Missing database credentials on new environments",
+      "Prerendering bailouts during Next.js build due to unhandled dynamic headers"
+    ]
+  }
+}
