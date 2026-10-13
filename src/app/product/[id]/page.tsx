@@ -17,7 +17,10 @@ import {
   CheckCircle2,
   XCircle,
   Package,
+  Trophy,
 } from "lucide-react";
+import StoreComparisonTable from "@/components/StoreComparisonTable";
+import { compareToolPrices } from "@/lib/comparison/engine";
 
 // Singleton PrismaClient for Next.js Server Components
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
@@ -207,6 +210,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
       : 0;
 
   const storeStyle = getStoreStyle(product.store);
+  const comparison = await compareToolPrices(
+    product.title + (product.sku ? ` ${product.sku}` : '')
+  );
 
   return (
     <div className="min-h-screen bg-zinc-50/60 dark:bg-black font-sans text-zinc-900 dark:text-zinc-100">
@@ -446,6 +452,29 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+
+        {/* Section: Canadian Multi-Store Comparison */}
+        <section className="bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm p-6 sm:p-8 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-900">
+            <div>
+              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                Live Canadian Hardware Retailer Price Comparison
+              </h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Current CAD pricing ranked across 9 Canadian retailers for this tool
+              </p>
+            </div>
+            {comparison.maxSavings > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                <TrendingDown className="w-3.5 h-3.5" />
+                Save up to ${comparison.maxSavings.toFixed(2)} CAD across Canada
+              </span>
+            )}
+          </div>
+
+          <StoreComparisonTable offers={comparison.offers} currency={product.currency} />
+        </section>
 
         {/* Section: Price History Chart */}
         <section className="space-y-4">

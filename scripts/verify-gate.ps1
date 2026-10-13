@@ -43,6 +43,12 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Simulation tests failed" }
     $Results.steps["user_flow_simulation"] = "PASSED"
 
+    # Step 5: Multi-Store Comparison Engine 2026 Test Suite
+    Write-Host "`n5. [Mesh: Test Engineer] Executing Canadian multi-store comparison suite..." -ForegroundColor Yellow
+    node scripts/test-comparison-engine.mjs
+    if ($LASTEXITCODE -ne 0) { throw "Comparison engine tests failed" }
+    $Results.steps["comparison_engine_suite"] = "PASSED"
+
     $Results.passed = $true
     $Duration = ((Get-Date) - $StartTime).TotalSeconds
     $Results["durationSeconds"] = $Duration
